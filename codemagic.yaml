@@ -1,0 +1,23 @@
+workflows:
+  ios-release:
+    name: Asas iOS Release
+    instance_type: mac_mini_m1
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.asas.abuljainpro
+      flutter: stable
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter pub get
+      - name: Build IPA for App Store
+        script: |
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth:
+          integration: apple_developer_portal
+        submit_to_testflight: true
