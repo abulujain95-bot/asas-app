@@ -13,23 +13,26 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: تهيئة المشروع وضبط المعرّف
+      - name: إعادة بناء وهيكلة ملفات الآيفون من الصفر
         script: |
           flutter clean
+          flutter create . --platforms=ios
           flutter pub get
+      - name: ضبط المعرّف (Bundle ID)
+        script: |
           sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.asas.abuljainpro;/g" ios/Runner.xcodeproj/project.pbxproj
-      - name: إنشاء وتكوين ملف Podfile لتوافق الآيفون
+      - name: فرض إصدار 13.0 وتحديث المكتبات بالقوة
         script: |
           cd ios
-          flutter build ios --config-only
-          sed -i '' "s/# platform :ios, '12.0'/platform :ios, '13.0'/g" Podfile
-          sed -i '' "s/# platform :ios, '11.0'/platform :ios, '13.0'/g" Podfile
-          sed -i '' "s/# platform :ios, '9.0'/platform :ios, '13.0'/g" Podfile
-      - name: إعداد مكتبات نظام الآيفون وتطهير الكاش
-        script: |
-          cd ios
+          # هذه الأوامر تدمج إصدار 13.0 في أعلى الملف أياً كان شكله
+          echo "platform :ios, '13.0'" > Podfile.temp
+          cat Podfile >> Podfile.temp
+          mv Podfile.temp Podfile
+          
+          # مسح الكاش القديم وتحديث السيرفرات
           rm -rf Podfile.lock Pods
-          pod install --repo-update
+          pod repo update
+          pod install
       - name: إجبار المشروع على استخدام ملفات التوقيع المرفوعة
         script: |
           xcode-project use-profiles
