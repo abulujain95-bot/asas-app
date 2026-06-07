@@ -1,0 +1,48 @@
+name: asas
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 1.0.2+3
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # حزمة إعلانات جوجل
+  google_mobile_ads: ^4.0.0 
+  # لحفظ البيانات محلياً
+  shared_preferences: ^2.2.2
+  # الخطوط لدعم اللغة العربية في واجهة التطبيق
+  google_fonts: ^6.1.0
+  # لإدارة حالة التطبيق
+  provider: ^6.1.1
+  # حزم استخراج وطباعة العقود بصيغة PDF
+  pdf: ^3.10.8
+  printing: ^5.11.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # حزمة توليد أيقونات التطبيق
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  
+  # تفعيل مجلد الصور والخطوط للاستخدام المحلي (بدون إنترنت)
+  assets:
+    - assets/icon/app_icon.png
+    - assets/fonts/Tajawal-Regular.ttf
+    - assets/fonts/Tajawal-Bold.ttf
+
+# إعدادات توليد أيقونة التطبيق للأندرويد والآيفون
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  remove_alpha_ios: true
