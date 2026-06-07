@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 120
     integrations:
-      app_store_connect: "ASAS API" # 👈 تأكد أن هذا الاسم يطابق تماماً اسم الربط في إعدادات Codemagic لديك
+      app_store_connect: "ASAS API" 
     environment:
       ios_signing:
         distribution_type: app_store
@@ -18,11 +18,18 @@ workflows:
           flutter clean
           flutter pub get
           sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.asas.abuljainpro;/g" ios/Runner.xcodeproj/project.pbxproj
+      - name: إنشاء وتكوين ملف Podfile لتوافق الآيفون
+        script: |
+          cd ios
+          flutter build ios --config-only
+          sed -i '' "s/# platform :ios, '12.0'/platform :ios, '13.0'/g" Podfile
+          sed -i '' "s/# platform :ios, '11.0'/platform :ios, '13.0'/g" Podfile
+          sed -i '' "s/# platform :ios, '9.0'/platform :ios, '13.0'/g" Podfile
       - name: إعداد مكتبات نظام الآيفون وتطهير الكاش
         script: |
           cd ios
           rm -rf Podfile.lock Pods
-          pod install
+          pod install --repo-update
       - name: إجبار المشروع على استخدام ملفات التوقيع المرفوعة
         script: |
           xcode-project use-profiles
