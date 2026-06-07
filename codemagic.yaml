@@ -1,19 +1,34 @@
 workflows:
-  ios-release:
-    name: Asas iOS Release
+  ios-release-workflow:
+    name: Asas iOS App Store Release
     instance_type: mac_mini_m1
+    max_build_duration: 120
+    integrations:
+      app_store_connect: "ASAS API" # 👈 تأكد أن هذا الاسم يطابق تماماً اسم الربط في إعدادات Codemagic لديك
     environment:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.asas.abuljainpro
       flutter: stable
+      xcode: latest
+      cocoapods: default
     scripts:
-      - name: Install dependencies
+      - name: تهيئة المشروع وضبط المعرّف
         script: |
+          flutter clean
           flutter pub get
-      - name: Build IPA for App Store
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.asas.abuljainpro;/g" ios/Runner.xcodeproj/project.pbxproj
+      - name: إعداد مكتبات نظام الآيفون وتطهير الكاش
         script: |
-          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+          cd ios
+          rm -rf Podfile.lock Pods
+          pod install
+      - name: إجبار المشروع على استخدام ملفات التوقيع المرفوعة
+        script: |
+          xcode-project use-profiles
+      - name: بناء النسخة النهائية (App Store)
+        script: |
+          flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
