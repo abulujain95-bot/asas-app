@@ -18,15 +18,18 @@ workflows:
           flutter clean
           flutter create . --platforms=ios
           flutter pub get
+      - name: تنظيف عميق لبيئة CocoaPods والاعتمادات
+        script: |
+          cd ios
+          # إزالة أي كاش قديم لـ CocoaPods و Ruby
+          rm -rf Pods
+          rm -rf Podfile.lock
+          rm -rf ~/.cocoapods/repos
+          pod cache clean --all
       - name: ضبط المعرّف وتهيئة الروابط المحلية للمكتبات
         script: |
-          # 1. تغيير المعرّف
           sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.asas.abuljainpro;/g" ios/Runner.xcodeproj/project.pbxproj
-          
-          # 2. هذا هو الأمر السحري! يقوم بربط جميع المكتبات (مثل الإعلانات والويب) محلياً داخل نظام الماك
           flutter build ios --config-only
-          
-          # 3. تفعيل إصدار 13.0 لتوافق إعلانات جوجل
           sed -i '' "s/^# platform :ios.*/platform :ios, '13.0'/g" ios/Podfile
           sed -i '' "s/^platform :ios.*/platform :ios, '13.0'/g" ios/Podfile
       - name: إجبار المشروع على استخدام ملفات التوقيع المرفوعة
@@ -34,7 +37,7 @@ workflows:
           xcode-project use-profiles
       - name: بناء النسخة النهائية (App Store)
         script: |
-          # أمر البناء هذا سيقوم تلقائياً بتنفيذ pod install بالطريقة الصحيحة والآمنة الخاصة بفلاتر
+          # سيقوم فلاتر الآن بتثبيت المكتبات النظيفة قبل البناء
           flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
